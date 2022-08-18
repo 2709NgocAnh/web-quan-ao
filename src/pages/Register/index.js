@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import classNames from 'classnames/bind';
+import axios from 'axios';
 
 import FormRegister from '~/pages/Register/FormRegister';
 import FormSign from './FormSign';
@@ -14,13 +15,12 @@ const Register = () => {
         password_confirm: '',
     });
 
-    const inputs = [
-        {
+    const inputs = [{
             id: 1,
             name: 'name',
             type: 'text',
             placeholder: 'Username',
-            errorMessage: 'Username should be 3-16 characters ',
+            errorMessage: 'Tên người dùng phải từ 3-16 ký tự!',
             label: 'Username',
             pattern: '^[[A-Z]|[a-z]][[A-Z]|[a-z]|\\d|[_]]{7,29}$',
             required: true,
@@ -32,7 +32,7 @@ const Register = () => {
             name: 'email',
             type: 'email',
             placeholder: 'Email',
-            errorMessage: 'It should be a valid email address!',
+            errorMessage: 'Email phải là một địa chỉ email hợp lệ!',
             label: 'Email',
             pattern: '[a-z0-9]+@[a-z]+.[a-z]{2,3}',
             required: true,
@@ -54,7 +54,7 @@ const Register = () => {
             name: 'password_confirm',
             type: 'password',
             placeholder: 'Confirm Password',
-            errorMessage: "Passwords don't match!",
+            errorMessage: 'Mật khẩu không khớp!',
             label: 'Confirm Password',
             reps: values.password,
             required: true,
@@ -65,30 +65,52 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(values);
+        axios
+            .post('http://localhost:8080/tttn_be/public/api/user/register', {...values, type_id: 2 })
+            .then(function(response) {
+                alert(response.data.message);
+                if (response.data.result) {
+                    setValues({
+                        name: '',
+                        email: '',
+                        password: '',
+                        password_confirm: '',
+                    });
+                }
+
+                //window.location.href = 'http://localhost:3000/register';
+            })
+            .catch(function(error) {
+                alert(error.response.data.message);
+                console.log(error);
+            });
     };
 
     const onChange = (e) => {
-        setValues({ ...values, [e.target.name]: e.target.value });
+        setValues({...values, [e.target.name]: e.target.value });
     };
 
-    return (
-        <div class={cx('container')}>
-            <FormSign />
-            <form onSubmit={handleSubmit} className={cx('form-Register')} autoComplete="off">
-                <h3 className={cx('form-heading')}>ĐĂNG KÝ THÀNH VIÊN MỚI </h3>
-                {inputs.map((input) => (
-                    <FormRegister
-                        key={input.id}
-                        {...input}
-                        values={values}
-                        value={values[input.name]}
-                        onChange={onChange}
-                    />
-                ))}
-
-                <button className={cx('form-submit')}>Đăng ký</button>
-            </form>
-        </div>
+    return ( <
+        div class = { cx('container') } >
+        <
+        FormSign / >
+        <
+        form onSubmit = { handleSubmit }
+        className = { cx('form-Register') }
+        autoComplete = "off" >
+        <
+        h3 className = { cx('form-heading') } > ĐĂNG KÝ THÀNH VIÊN MỚI < /h3>{' '} {
+            inputs.map((input) => ( <
+                FormRegister key = { input.id } {...input }
+                values = { values }
+                value = { values[input.name] }
+                onChange = { onChange }
+                />
+            ))
+        } { ' ' } <
+        button className = { cx('form-submit') } > Đăng ký < /button>{' '} <
+        /form>{' '} <
+        /div>
     );
 };
 
